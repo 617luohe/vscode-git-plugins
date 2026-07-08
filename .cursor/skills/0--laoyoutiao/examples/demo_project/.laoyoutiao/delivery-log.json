@@ -1,0 +1,10 @@
+{
+  "initialized_at": "2026-06-29",
+  "snapshot": {
+    "sort": ["basic", "timsort"],
+    "cache": ["memory", "redis"],
+    "renderer": ["dom"],
+    "auth": ["basic"]
+  },
+  "deliveries": []
+}

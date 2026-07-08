@@ -1,0 +1,6 @@
+{
+  "sort": "basic",
+  "cache": "memory",
+  "renderer": "dom",
+  "auth": "basic"
+}

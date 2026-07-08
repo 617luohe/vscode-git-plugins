@@ -1,0 +1,78 @@
+{
+  "name": "quick-git-exclude",
+  "displayName": "Quick Git Exclude",
+  "description": "%extension.description%",
+  "version": "0.0.1",
+  "publisher": "luohe",
+  "engines": {
+    "vscode": "^1.75.0",
+    "node": ">=20.0.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "quick-git-exclude.excludeFromVC",
+        "title": "%command.excludeFromVC%",
+        "category": "Quick Git Exclude"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "quick-git-exclude.excludeFromVC",
+          "group": "2_workspace@2"
+        }
+      ],
+      "scm/resourceState/context": [
+        {
+          "command": "quick-git-exclude.excludeFromVC",
+          "when": "scmProvider == git",
+          "group": "2_workspace@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "quick-git-exclude.excludeFromVC",
+          "when": "false"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "vite build",
+    "watch": "vite build --mode development --watch",
+    "package": "vite build --mode production",
+    "typecheck": "tsc --noEmit",
+    "vscode:package": "npm run package && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.30",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^3.3.2",
+    "terser": "^5.39.0",
+    "typescript": "^5.4.2",
+    "vite": "^6.2.5"
+  },
+  "dependencies": {
+    "simple-git": "^3.27.0"
+  },
+  "keywords": [
+    "git",
+    "exclude",
+    "rm-cached",
+    "untrack",
+    "git-rm"
+  ],
+  "author": "luohe",
+  "license": "MIT",
+  "l10n": "./l10n"
+}
