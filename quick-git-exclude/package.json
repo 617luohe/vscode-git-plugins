@@ -74,5 +74,10 @@
   ],
   "author": "luohe",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/617luohe/vscode-git-plugins.git",
+    "directory": "quick-git-exclude"
+  },
   "l10n": "./l10n"
 }
