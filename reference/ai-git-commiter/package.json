@@ -1,0 +1,455 @@
+{
+  "name": "ai-git-commiter",
+  "displayName": "AI Git Commiter",
+  "description": "%extension.description%",
+  "version": "1.0.56",
+  "publisher": "zdt1013",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zdt1013/ai-git-commiter.git"
+  },
+  "engines": {
+    "vscode": "^1.75.0",
+    "node": ">=20.0.0"
+  },
+  "icon": "asserts/icon.png",
+  "categories": [
+    "SCM Providers",
+    "AI",
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "packageManager": "pnpm@10.8.1",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "activationEvents": [
+    "onCommand:ai-git-commiter",
+    "onView:scm"
+  ],
+  "enabledApiProposals": [
+    "inlineCompletionsAdditions"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.ai-git-commiter",
+        "title": "%command.generateCommitMessage%",
+        "icon": {
+          "light": "asserts/icon.svg",
+          "dark": "asserts/icon.svg"
+        }
+      },
+      {
+        "command": "ai-git-commiter.addPrompt",
+        "title": "%command.addPrompt%"
+      },
+      {
+        "command": "ai-git-commiter.editPrompt",
+        "title": "%command.editPrompt%"
+      },
+      {
+        "command": "ai-git-commiter.deletePrompt",
+        "title": "%command.deletePrompt%"
+      },
+      {
+        "command": "ai-git-commiter.selectPrompt",
+        "title": "%command.selectPrompt%"
+      },
+      {
+        "command": "ai-git-commiter.downloadPrompts",
+        "title": "%command.downloadPrompts%"
+      },
+      {
+        "command": "ai-git-commiter.manualPolishCommitMessage",
+        "title": "%command.manualPolish%"
+      },
+      {
+        "command": "ai-git-commiter.switchAIModel",
+        "title": "%command.switchModel%"
+      },
+      {
+        "command": "ai-git-commiter.settings",
+        "title": "%command.openSettings%"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "extension.ai-git-commiter",
+          "group": "navigation",
+          "when": "scmProvider == git"
+        },
+        {
+          "command": "extension.ai-git-commiter",
+          "group": "inline",
+          "when": "scmProvider == git"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AI Git Commiter",
+      "properties": {
+        "ai-git-commiter.language": {
+          "type": "string",
+          "default": "简体中文",
+          "order": 1,
+          "enum": [
+            "简体中文",
+            "English"
+          ],
+          "description": "%config.language.description%"
+        },
+        "ai-git-commiter.provider": {
+          "type": "string",
+          "default": "OpenAI",
+          "order": 2,
+          "enum": [
+            "OpenAI",
+            "Gemini",
+            "Anthropic"
+          ],
+          "enumDescriptions": [
+            "%config.provider.enum.openai%",
+            "%config.provider.enum.gemini%",
+            "%config.provider.enum.anthropic%"
+          ],
+          "description": "%config.provider.description%"
+        },
+        "ai-git-commiter.enable_thinking": {
+          "type": "boolean",
+          "default": false,
+          "order": 3,
+          "description": "%config.enable_thinking.description%"
+        },
+        "ai-git-commiter.openai.thinkingMode": {
+          "type": "string",
+          "default": "disabled",
+          "order": 4,
+          "enum": [
+            "disabled",
+            "standard",
+            "legacy",
+            "vllm"
+          ],
+          "enumDescriptions": [
+            "%config.thinkingMode.enum.disabled%",
+            "%config.thinkingMode.enum.standard%",
+            "%config.thinkingMode.enum.legacy%",
+            "%config.thinkingMode.enum.vllm%"
+          ],
+          "description": "%config.thinkingMode.description%",
+          "when": "ai-git-commiter.provider == OpenAI"
+        },
+        "ai-git-commiter.userAgent": {
+          "type": "string",
+          "order": 5,
+          "default": "",
+          "description": "%config.userAgent.description%"
+        },
+        "ai-git-commiter.openai.baseUrl": {
+          "type": "string",
+          "order": 6,
+          "default": "https://api.openai.com/v1",
+          "description": "%config.openai.baseUrl.description%",
+          "when": "ai-git-commiter.provider == OpenAI"
+        },
+        "ai-git-commiter.openai.apiKey": {
+          "type": "string",
+          "order": 7,
+          "default": "",
+          "description": "%config.openai.apiKey.description%",
+          "when": "ai-git-commiter.provider == OpenAI"
+        },
+        "ai-git-commiter.openai.model": {
+          "type": "string",
+          "order": 8,
+          "default": "",
+          "description": "%config.openai.model.description%",
+          "when": "ai-git-commiter.provider == OpenAI"
+        },
+        "ai-git-commiter.openai.temperature": {
+          "type": "number",
+          "order": 9,
+          "default": 0.3,
+          "minimum": 0,
+          "maximum": 2,
+          "description": "%config.openai.temperature.description%",
+          "when": "ai-git-commiter.provider == OpenAI"
+        },
+        "ai-git-commiter.openai.topP": {
+          "type": "number",
+          "order": 10,
+          "default": 1,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "%config.openai.topP.description%",
+          "when": "ai-git-commiter.provider == OpenAI"
+        },
+        "ai-git-commiter.openai.maxTokens": {
+          "type": "number",
+          "order": 11,
+          "default": 500,
+          "minimum": 1,
+          "description": "%config.openai.maxTokens.description%",
+          "when": "ai-git-commiter.provider == OpenAI"
+        },
+        "ai-git-commiter.gemini.baseUrl": {
+          "type": "string",
+          "order": 12,
+          "default": "https://generativelanguage.googleapis.com",
+          "description": "%config.gemini.baseUrl.description%",
+          "when": "ai-git-commiter.provider == Gemini"
+        },
+        "ai-git-commiter.gemini.apiKey": {
+          "type": "string",
+          "order": 13,
+          "default": "",
+          "description": "%config.gemini.apiKey.description%",
+          "when": "ai-git-commiter.provider == Gemini"
+        },
+        "ai-git-commiter.gemini.model": {
+          "type": "string",
+          "order": 14,
+          "default": "gemini-2.0-flash",
+          "description": "%config.gemini.model.description%",
+          "when": "ai-git-commiter.provider == Gemini"
+        },
+        "ai-git-commiter.gemini.temperature": {
+          "type": "number",
+          "order": 15,
+          "default": 0.3,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "%config.gemini.temperature.description%",
+          "when": "ai-git-commiter.provider == Gemini"
+        },
+        "ai-git-commiter.gemini.topK": {
+          "type": "number",
+          "order": 16,
+          "default": 40,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "%config.gemini.topK.description%",
+          "when": "ai-git-commiter.provider == Gemini"
+        },
+        "ai-git-commiter.gemini.topP": {
+          "type": "number",
+          "order": 17,
+          "default": 0.95,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "%config.gemini.topP.description%",
+          "when": "ai-git-commiter.provider == Gemini"
+        },
+        "ai-git-commiter.gemini.maxOutputTokens": {
+          "type": "number",
+          "order": 18,
+          "default": 500,
+          "minimum": 1,
+          "description": "%config.gemini.maxOutputTokens.description%",
+          "when": "ai-git-commiter.provider == Gemini"
+        },
+        "ai-git-commiter.anthropic.baseUrl": {
+          "type": "string",
+          "order": 19,
+          "default": "https://open.bigmodel.cn/api/anthropic",
+          "description": "%config.anthropic.baseUrl.description%",
+          "when": "ai-git-commiter.provider == Anthropic"
+        },
+        "ai-git-commiter.anthropic.apiKey": {
+          "type": "string",
+          "order": 20,
+          "default": "",
+          "description": "%config.anthropic.apiKey.description%",
+          "when": "ai-git-commiter.provider == Anthropic"
+        },
+        "ai-git-commiter.anthropic.model": {
+          "type": "string",
+          "order": 21,
+          "default": "glm-5.1",
+          "description": "%config.anthropic.model.description%",
+          "when": "ai-git-commiter.provider == Anthropic"
+        },
+        "ai-git-commiter.anthropic.temperature": {
+          "type": "number",
+          "order": 22,
+          "default": 0.3,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "%config.anthropic.temperature.description%",
+          "when": "ai-git-commiter.provider == Anthropic"
+        },
+        "ai-git-commiter.anthropic.topP": {
+          "type": "number",
+          "order": 23,
+          "default": 1,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "%config.anthropic.topP.description%",
+          "when": "ai-git-commiter.provider == Anthropic"
+        },
+        "ai-git-commiter.anthropic.maxTokens": {
+          "type": "number",
+          "order": 24,
+          "default": 500,
+          "minimum": 1,
+          "description": "%config.anthropic.maxTokens.description%",
+          "when": "ai-git-commiter.provider == Anthropic"
+        },
+        "ai-git-commiter.git-diff.area": {
+          "type": "string",
+          "order": 25,
+          "default": "auto",
+          "enum": [
+            "auto",
+            "cached",
+            "working"
+          ],
+          "enumDescriptions": [
+            "%config.gitDiff.area.enum.auto%",
+            "%config.gitDiff.area.enum.cached%",
+            "%config.gitDiff.area.enum.working%"
+          ],
+          "description": "%config.gitDiff.area.description%"
+        },
+        "ai-git-commiter.git-diff.wordDiff": {
+          "type": "boolean",
+          "order": 26,
+          "default": false,
+          "description": "%config.gitDiff.wordDiff.description%"
+        },
+        "ai-git-commiter.git-diff.unified": {
+          "type": "number",
+          "order": 27,
+          "default": 10,
+          "minimum": 0,
+          "description": "%config.gitDiff.unified.description%"
+        },
+        "ai-git-commiter.git-diff.noColor": {
+          "type": "boolean",
+          "order": 28,
+          "default": true,
+          "description": "%config.gitDiff.noColor.description%"
+        },
+        "ai-git-commiter.git-diff.diffFilter": {
+          "type": "string",
+          "order": 29,
+          "default": "ACDMRT",
+          "description": "%config.gitDiff.diffFilter.description%"
+        },
+        "ai-git-commiter.git-diff.filterMeta": {
+          "type": "boolean",
+          "order": 30,
+          "default": false,
+          "description": "%config.gitDiff.filterMeta.description%"
+        },
+        "ai-git-commiter.git-diff.includeSummary": {
+          "type": "boolean",
+          "order": 31,
+          "default": true,
+          "description": "%config.gitDiff.includeSummary.description%"
+        },
+        "ai-git-commiter.git-diff.maxChanges": {
+          "type": "number",
+          "order": 32,
+          "default": 500,
+          "minimum": 1,
+          "description": "%config.gitDiff.maxChanges.description%"
+        },
+        "ai-git-commiter.prompt.selectedPromptTemplateId": {
+          "type": "string",
+          "order": 33,
+          "default": "",
+          "readonly": true,
+          "description": "%config.prompt.selectedPromptTemplateId.description%"
+        },
+        "ai-git-commiter.prompt.selectedTemplatePrompt": {
+          "type": "string",
+          "order": 34,
+          "default": "",
+          "readonly": true,
+          "description": "%config.prompt.selectedTemplatePrompt.description%"
+        },
+        "ai-git-commiter.prompt.enableProjectPerception": {
+          "type": "boolean",
+          "order": 35,
+          "default": false,
+          "description": "%config.prompt.enableProjectPerception.description%"
+        },
+        "ai-git-commiter.prompt.projectInfoPath": {
+          "type": "string",
+          "scope": "resource",
+          "order": 36,
+          "default": "",
+          "description": "%config.prompt.projectInfoPath.description%"
+        },
+        "ai-git-commiter.prompt.enableRecentCommits": {
+          "type": "boolean",
+          "order": 37,
+          "default": false,
+          "description": "%config.prompt.enableRecentCommits.description%"
+        },
+        "ai-git-commiter.prompt.recentCommitsCount": {
+          "type": "number",
+          "order": 38,
+          "default": 3,
+          "minimum": 1,
+          "maximum": 20,
+          "description": "%config.prompt.recentCommitsCount.description%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "vite build",
+    "watch": "vite build --mode development --watch",
+    "package": "vite build --mode production",
+    "package-dev": "vite build --mode development",
+    "package-latest": "vite build --mode production-latest",
+    "lint": "eslint src --ext ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "vscode:package": "pnpm run package && vsce package --no-dependencies",
+    "vscode:package-dev": "pnpm run package-dev && vsce package --no-dependencies --out ai-git-commiter-dev.vsix",
+    "vscode:package-latest": "pnpm run package-latest && vsce package --no-dependencies --out ai-git-commiter-latest.vsix"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.17.30",
+    "@types/vscode": "^1.75.0",
+    "@typescript-eslint/eslint-plugin": "^7.3.1",
+    "@typescript-eslint/parser": "^7.3.1",
+    "@vscode/vsce": "^3.3.2",
+    "eslint": "^8.57.0",
+    "glob": "^10.3.10",
+    "mocha": "^10.3.0",
+    "terser": "^5.39.0",
+    "typescript": "^5.4.2",
+    "vite": "^6.2.5",
+    "vitest": "^4.1.5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "@google/genai": "^2.8.0",
+    "@types/xml2js": "^0.4.14",
+    "axios": "^1.6.7",
+    "openai": "^6.42.0",
+    "simple-git": "^3.27.0",
+    "uuid": "^14.0.0",
+    "xml2js": "^0.6.2"
+  },
+  "keywords": [
+    "ai",
+    "git",
+    "git-commit",
+    "llm",
+    "generator",
+    "openai",
+    "gemini"
+  ],
+  "author": "zdt",
+  "license": "MIT",
+  "l10n": "./l10n"
+}

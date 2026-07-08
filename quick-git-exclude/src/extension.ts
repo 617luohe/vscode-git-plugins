@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import simpleGit from 'simple-git';
+import simpleGit, { SimpleGit } from 'simple-git';
 
 let outputChannel: vscode.OutputChannel;
 
@@ -24,31 +24,28 @@ async function excludeFromVersionControl(
     clickedUri: vscode.Uri | undefined,
     selectedUris: vscode.Uri[] | undefined
 ) {
-    // 1. Collect all URIs to process
+    // 1. Collect URIs
     let uris: vscode.Uri[] = [];
-
     if (selectedUris && selectedUris.length > 0) {
-        // Multi-selection in Explorer
         uris = selectedUris;
     } else if (clickedUri) {
-        // Single selection in Explorer or SCM view
         uris = [clickedUri];
     } else {
-        vscode.window.showWarningMessage('No file selected. Please select one or more files first.');
+        vscode.window.showWarningMessage('请先选择一个或多个文件或文件夹。');
         return;
     }
 
-    // 2. Get workspace folder
+    // 2. Workspace folder
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders || workspaceFolders.length === 0) {
-        vscode.window.showErrorMessage('No workspace folder found.');
+        vscode.window.showErrorMessage('没有找到工作区目录。');
         return;
     }
 
     const workspaceRoot = workspaceFolders[0].uri.fsPath;
     const git = simpleGit(workspaceRoot, { binary: 'git' });
 
-    // 3. Verify it's a git repository
+    // 3. Verify git repo
     try {
         const isRepo = await git.checkIsRepo();
         if (!isRepo) {
@@ -60,78 +57,190 @@ async function excludeFromVersionControl(
         return;
     }
 
-    // 4. Process each URI
-    const results: { path: string; success: boolean; message: string }[] = [];
+    // 4. Collect all tracked + untracked files under selected paths
+    const allTrackedFiles: string[] = [];
+    const allUntrackedFiles: string[] = [];
 
-    await vscode.window.withProgress(
-        {
-            location: vscode.ProgressLocation.Notification,
-            title: '正在从版本管理中移除文件...',
-            cancellable: false,
-        },
-        async () => {
-            for (const u of uris) {
-                const relativePath = path
-                    .relative(workspaceRoot, u.fsPath)
-                    .replace(/\\/g, '/');
+    for (const u of uris) {
+        const relativePath = path.relative(workspaceRoot, u.fsPath).replace(/\\/g, '/');
+        if (!relativePath) {
+            // User selected the workspace root itself — skip
+            outputChannel.appendLine('  ⚠ 不能选择仓库根目录。');
+            continue;
+        }
 
-                try {
-                    // Determine if it's a directory
-                    let isDirectory = false;
-                    try {
-                        isDirectory = fs.statSync(u.fsPath).isDirectory();
-                    } catch {
-                        // File might not exist on disk (e.g. deleted but still tracked)
-                        isDirectory = false;
-                    }
+        let isDirectory = false;
+        try {
+            isDirectory = fs.statSync(u.fsPath).isDirectory();
+        } catch {
+            isDirectory = false;
+        }
 
-                    const args: string[] = ['rm', '--cached'];
-                    if (isDirectory) {
-                        args.push('-r');
-                    }
-                    args.push('--force', relativePath);
-
-                    await git.raw(args);
-                    results.push({ path: relativePath, success: true, message: '' });
-                    outputChannel.appendLine(`✓ Excluded: ${relativePath}`);
-                } catch (error: any) {
-                    const errorMsg = error?.message || String(error);
-                    results.push({ path: relativePath, success: false, message: errorMsg });
-                    outputChannel.appendLine(`✗ Failed: ${relativePath} — ${errorMsg}`);
+        if (isDirectory) {
+            const dirPath = relativePath.endsWith('/') ? relativePath : relativePath + '/';
+            // Tracked files under directory
+            try {
+                const output = await git.raw(['ls-files', '-z', dirPath]);
+                if (output) {
+                    const files = output.split('\0').filter(Boolean);
+                    allTrackedFiles.push(...files);
+                    outputChannel.appendLine(`  找到 ${files.length} 个跟踪文件在: ${relativePath}/`);
                 }
+            } catch {
+                // ignore
+            }
+
+            // Untracked files under directory
+            try {
+                const output = await git.raw(['ls-files', '--others', '--exclude-standard', '-z', dirPath]);
+                if (output) {
+                    const files = output.split('\0').filter(Boolean);
+                    allUntrackedFiles.push(...files);
+                    if (files.length > 0) {
+                        outputChannel.appendLine(`  找到 ${files.length} 个未跟踪文件在: ${relativePath}/`);
+                    }
+                }
+            } catch {
+                // ignore
+            }
+        } else {
+            // Single file — check tracked
+            try {
+                const output = await git.raw(['ls-files', relativePath]);
+                if (output && output.trim()) {
+                    allTrackedFiles.push(relativePath);
+                } else {
+                    allUntrackedFiles.push(relativePath);
+                }
+            } catch {
+                allUntrackedFiles.push(relativePath);
             }
         }
-    );
-
-    // 5. Report results
-    const successCount = results.filter((r) => r.success).length;
-    const failCount = results.filter((r) => !r.success).length;
-
-    if (successCount > 0) {
-        const msg =
-            successCount === 1
-                ? `已成功将 1 个文件从版本管理中移除。`
-                : `已成功将 ${successCount} 个文件从版本管理中移除。`;
-        vscode.window.showInformationMessage(msg);
     }
 
-    if (failCount > 0) {
-        const msg = `${failCount} 个文件移除失败。请查看输出信息了解详情。`;
-        vscode.window.showWarningMessage(msg, '查看输出').then((selection) => {
-            if (selection === '查看输出') {
-                outputChannel.show();
+    if (allTrackedFiles.length === 0 && allUntrackedFiles.length === 0) {
+        vscode.window.showInformationMessage('所选路径下没有找到任何 Git 文件。');
+        return;
+    }
+
+    // 5. Remove tracked files from index
+    let removedCount = 0;
+    let failCount = 0;
+    let addedToGitignore = false;
+
+    if (allTrackedFiles.length > 0) {
+        await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: `正在从版本管理中移除 ${allTrackedFiles.length} 个文件...`,
+                cancellable: false,
+            },
+            async () => {
+                const batchSize = 50;
+                for (let i = 0; i < allTrackedFiles.length; i += batchSize) {
+                    const batch = allTrackedFiles.slice(i, i + batchSize);
+                    try {
+                        await git.raw(['rm', '--cached', '--force', ...batch]);
+                        removedCount += batch.length;
+                        for (const file of batch) {
+                            outputChannel.appendLine(`✓ 已排除: ${file}`);
+                        }
+                    } catch {
+                        for (const file of batch) {
+                            try {
+                                await git.raw(['rm', '--cached', '--force', file]);
+                                removedCount++;
+                                outputChannel.appendLine(`✓ 已排除: ${file}`);
+                            } catch (err2: any) {
+                                failCount++;
+                                outputChannel.appendLine(`✗ 失败: ${file} — ${err2?.message || String(err2)}`);
+                            }
+                        }
+                    }
+                }
             }
-        });
+        );
     }
 
-    // 6. Refresh SCM view to reflect changes
+    // 6. Ask about .gitignore if there were untracked files or removed files
+    const gitignorePaths = new Set<string>();
+    for (const u of uris) {
+        const relativePath = path.relative(workspaceRoot, u.fsPath).replace(/\\/g, '/');
+        if (!relativePath) continue;
+
+        let isDirectory = false;
+        try {
+            isDirectory = fs.statSync(u.fsPath).isDirectory();
+        } catch {
+            isDirectory = false;
+        }
+
+        if (isDirectory) {
+            gitignorePaths.add(relativePath.endsWith('/') ? relativePath : relativePath + '/');
+        } else {
+            // For files, add the specific file path
+            gitignorePaths.add(relativePath);
+        }
+    }
+
+    if (gitignorePaths.size > 0) {
+        const trackedOrUntracked = allTrackedFiles.length > 0 ? '已从 Git 跟踪中移除' : '检测到未跟踪文件';
+        const answer = await vscode.window.showInformationMessage(
+            `${trackedOrUntracked}。是否将这些路径添加到 .gitignore 以永久忽略？`,
+            '添加到 .gitignore',
+            '跳过'
+        );
+
+        if (answer === '添加到 .gitignore') {
+            try {
+                const gitignorePath = path.join(workspaceRoot, '.gitignore');
+                let gitignoreContent = '';
+                try {
+                    gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
+                } catch {
+                    // .gitignore doesn't exist yet
+                }
+
+                const lines = gitignoreContent.split('\n').map(l => l.trim());
+                const newEntries: string[] = [];
+
+                for (const gp of Array.from(gitignorePaths)) {
+                    // Check if already in .gitignore
+                    const alreadyPresent = lines.some(l => l === gp || l === '/' + gp);
+                    if (!alreadyPresent) {
+                        newEntries.push('/' + gp);
+                    }
+                }
+
+                if (newEntries.length > 0) {
+                    const addition = '\n' + newEntries.join('\n') + '\n';
+                    fs.appendFileSync(gitignorePath, addition, 'utf-8');
+                    addedToGitignore = true;
+                    for (const entry of newEntries) {
+                        outputChannel.appendLine(`✓ 已添加到 .gitignore: ${entry}`);
+                    }
+                } else {
+                    outputChannel.appendLine('.gitignore 中已包含这些路径，无需重复添加。');
+                }
+            } catch (error: any) {
+                outputChannel.appendLine(`✗ 写入 .gitignore 失败: ${error?.message || String(error)}`);
+            }
+        }
+    }
+
+    // 7. Report results
+    const parts: string[] = [];
+    if (removedCount > 0) parts.push(`已从跟踪中移除 ${removedCount} 个文件`);
+    if (failCount > 0) parts.push(`${failCount} 个文件移除失败`);
+    if (addedToGitignore) parts.push('已添加到 .gitignore');
+    if (parts.length > 0) {
+        vscode.window.showInformationMessage(parts.join('，'));
+    }
+
+    // 8. Refresh SCM
     try {
         vscode.commands.executeCommand('git.refresh');
     } catch {
-        // git.refresh may not be available in all versions
+        // ignore
     }
-}
-
-export function deactivate() {
-    // Cleanup handled by context.subscriptions
 }
