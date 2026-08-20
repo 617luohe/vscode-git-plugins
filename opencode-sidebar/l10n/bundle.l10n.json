@@ -1,0 +1,9 @@
+{
+  "extension.description": "Launch OpenCode from the Activity Bar.",
+  "command.installOpenCode": "Install OpenCode",
+  "Install OpenCode": "Install OpenCode",
+  "OpenCode is not installed.": "OpenCode is not installed.",
+  "Click to launch OpenCode": "Click to launch OpenCode",
+  "OpenCode could not be launched.": "OpenCode could not be launched.",
+  "view.launch": "Launch OpenCode"
+}
