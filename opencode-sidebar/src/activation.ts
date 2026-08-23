@@ -7,7 +7,6 @@ type ActivationApi = {
   readonly getExtension: () => Extension | undefined
   readonly getCommands: () => Promise<readonly string[]>
   readonly executeCommand: (command: string) => Promise<void>
-  readonly closeSidebar: () => Promise<void>
   readonly showInformationMessage: ControllerHost["showInformationMessage"]
   readonly showErrorMessage: ControllerHost["showErrorMessage"]
   readonly localize: ControllerHost["localize"]
@@ -18,7 +17,6 @@ export const activateExtension = (api: ActivationApi): LaunchController => new L
   getExtension: api.getExtension,
   getCommands: api.getCommands,
   executeCommand: api.executeCommand,
-  closeSidebar: api.closeSidebar,
   showInformationMessage: api.showInformationMessage,
   showErrorMessage: api.showErrorMessage,
   localize: api.localize,
@@ -40,7 +38,6 @@ export const activate = (context: vscode.ExtensionContext): void => {
     },
     getCommands: async () => vscode.commands.getCommands(true),
     executeCommand: async (command) => { await vscode.commands.executeCommand(command) },
-    closeSidebar: async () => { await vscode.commands.executeCommand("workbench.action.closeSidebar") },
      showInformationMessage: async (message, action) => vscode.window.showInformationMessage(message, action),
      showErrorMessage: async (message) => vscode.window.showErrorMessage(message),
      localize: (message) => vscode.l10n.t(message),

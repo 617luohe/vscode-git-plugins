@@ -10,7 +10,6 @@ describe("activateExtension", () => {
       getExtension: () => undefined,
       getCommands: async () => [],
       executeCommand,
-      closeSidebar: async () => undefined,
        showInformationMessage: async () => undefined,
        showErrorMessage: async () => undefined,
        localize: (message) => message,

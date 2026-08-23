@@ -17,7 +17,6 @@ const createFixture = (visible = false) => {
   let listener: VisibilityListener | undefined
   let extension: Extension | undefined = { isActive: true, activate: async () => undefined }
   const executeCommand = vi.fn(async (): Promise<void> => undefined)
-  const closeSidebar = vi.fn(async (): Promise<void> => undefined)
   const showInformationMessage = vi.fn(async (): Promise<string | undefined> => "Install OpenCode")
   const fixture = {
     treeView: {
@@ -29,7 +28,6 @@ const createFixture = (visible = false) => {
     },
     getExtension: () => extension,
     executeCommand,
-    closeSidebar,
     showInformationMessage,
     showErrorMessage: vi.fn(async () => undefined),
     getCommands: vi.fn(async () => [OPEN_COMMAND]),
@@ -56,7 +54,6 @@ describe("LaunchController", () => {
     new LaunchController(fixture)
     await flush()
     expect(fixture.executeCommand).toHaveBeenCalledWith(OPEN_COMMAND)
-    expect(fixture.closeSidebar).toHaveBeenCalledOnce()
   })
 
   it("suppresses concurrent duplicate launches and rearms after hidden", async () => {
@@ -87,7 +84,6 @@ describe("LaunchController", () => {
     await flush()
     expect(fixture.showInformationMessage).toHaveBeenCalled()
     expect(fixture.executeCommand).toHaveBeenCalledWith(INSTALL_COMMAND)
-    expect(fixture.closeSidebar).toHaveBeenCalledOnce()
   })
 
   it("offers installation when the official command is unregistered", async () => {

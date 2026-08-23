@@ -4,7 +4,6 @@ export type ControllerHost = {
   readonly treeView: { readonly visible: boolean; readonly onDidChangeVisibility: (listener: (event: boolean) => void) => { dispose: () => void } }
   readonly getExtension: () => Extension | undefined
   readonly executeCommand: (command: string) => Promise<void>
-  readonly closeSidebar: () => Promise<void>
   readonly showInformationMessage: (message: string, action: string) => Promise<string | undefined>
   readonly showErrorMessage: (message: string) => Promise<string | undefined>
   readonly getCommands: () => Promise<readonly string[]>
@@ -58,7 +57,6 @@ export class LaunchController {
         return
       }
       await this.host.executeCommand(OPEN_COMMAND)
-      await this.host.closeSidebar()
     } finally {
       this.inFlight = false
     }
@@ -68,7 +66,6 @@ export class LaunchController {
     const action = this.host.localize("Install OpenCode")
     const choice = await this.host.showInformationMessage(this.host.localize("OpenCode is not installed."), action)
     if (choice === action) await this.host.executeCommand(INSTALL_COMMAND)
-    await this.host.closeSidebar()
   }
 }
 
