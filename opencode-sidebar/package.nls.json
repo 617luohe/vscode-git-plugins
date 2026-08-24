@@ -1,6 +1,7 @@
 {
   "extension.description": "Launch OpenCode from the Activity Bar.",
   "command.installOpenCode": "Install OpenCode",
+  "command.toggleMode": "Toggle omos / pomos",
   "view.launch": "Launch OpenCode",
   "container.title": "OpenCode"
 }

@@ -7,7 +7,10 @@ describe("manifest machine contracts", () => {
     expect(manifest.name).toBe("opencode-sidebar")
     expect(manifest.publisher).toBe("luohe")
     expect(manifest.activationEvents).toContain("onView:opencode-sidebar.launch")
-    expect(manifest.contributes.commands.map((command) => command.command)).toEqual(["opencode-sidebar.installOpenCode"])
+    expect(manifest.contributes.commands.map((command) => command.command)).toEqual([
+      "opencode-sidebar.installOpenCode",
+      "opencode-sidebar.toggleMode",
+    ])
     expect(manifest.contributes.viewsContainers.activitybar[0]?.id).toBe("opencode-sidebar")
     const views = manifest.contributes.views["opencode-sidebar"]
     expect(views).toBeDefined()

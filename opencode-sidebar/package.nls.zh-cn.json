@@ -1,6 +1,7 @@
 {
   "extension.description": "从活动栏启动 OpenCode。",
   "command.installOpenCode": "安装 OpenCode",
+  "command.toggleMode": "切换 omos / pomos",
   "view.launch": "启动 OpenCode",
   "container.title": "OpenCode"
 }

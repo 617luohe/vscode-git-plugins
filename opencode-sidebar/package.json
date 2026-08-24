@@ -10,8 +10,19 @@
   "icon": "assets/icon.png",
   "activationEvents": ["onView:opencode-sidebar.launch"],
   "contributes": {
-    "commands": [{ "command": "opencode-sidebar.installOpenCode", "title": "%command.installOpenCode%" }],
-    "menus": { "commandPalette": [{ "command": "opencode-sidebar.installOpenCode", "when": "false" }] },
+    "commands": [
+      { "command": "opencode-sidebar.installOpenCode", "title": "%command.installOpenCode%" },
+      { "command": "opencode-sidebar.toggleMode", "title": "%command.toggleMode%", "icon": "$(sync)" }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "opencode-sidebar.installOpenCode", "when": "false" },
+        { "command": "opencode-sidebar.toggleMode" }
+      ],
+      "view/title": [
+        { "command": "opencode-sidebar.toggleMode", "when": "view == opencode-sidebar.launch", "group": "navigation@1" }
+      ]
+    },
     "viewsContainers": { "activitybar": [{ "id": "opencode-sidebar", "title": "%container.title%", "icon": "assets/opencode-activity.svg" }] },
     "views": { "opencode-sidebar": [{ "id": "opencode-sidebar.launch", "name": "%view.launch%", "type": "tree" }] }
   },
