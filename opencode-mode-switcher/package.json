@@ -8,7 +8,7 @@
   "categories": ["Other", "AI"],
   "main": "./dist/extension.js",
   "icon": "assets/icon.png",
-  "activationEvents": [],
+  "activationEvents": ["onStartupFinished"],
   "contributes": {
     "commands": [
       { "command": "opencode-mode-switcher.toggle", "title": "%command.toggle%", "icon": "$(sync)" },
