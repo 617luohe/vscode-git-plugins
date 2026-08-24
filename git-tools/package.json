@@ -1,0 +1,258 @@
+{
+  "name": "git-tools",
+  "displayName": "Git Tools",
+  "description": "%extension.description%",
+  "version": "0.1.0",
+  "publisher": "luohe",
+  "engines": {
+    "vscode": "^1.75.0",
+    "node": ">=20.0.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "AI",
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "activationEvents": [
+    "onCommand:git-tools.generateCommit",
+    "onCommand:git-tools.switchAIModel",
+    "onCommand:git-tools.excludeFromVC",
+    "onView:scm"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "git-tools.generateCommit",
+        "title": "%command.generateCommit%",
+        "category": "Git Tools"
+      },
+      {
+        "command": "git-tools.switchAIModel",
+        "title": "%command.switchAIModel%",
+        "category": "Git Tools"
+      },
+      {
+        "command": "git-tools.excludeFromVC",
+        "title": "%command.excludeFromVC%",
+        "category": "Git Tools"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "git-tools.excludeFromVC",
+          "group": "2_workspace@2"
+        }
+      ],
+      "scm/resourceState/context": [
+        {
+          "command": "git-tools.generateCommit",
+          "when": "scmProvider == git",
+          "group": "1_modification@1"
+        },
+        {
+          "command": "git-tools.excludeFromVC",
+          "when": "scmProvider == git",
+          "group": "2_workspace@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "git-tools.generateCommit",
+          "when": "false"
+        },
+        {
+          "command": "git-tools.excludeFromVC",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Git Tools",
+      "properties": {
+        "gitTools.language": {
+          "type": "string",
+          "default": "简体中文",
+          "order": 1,
+          "enum": [
+            "简体中文",
+            "English"
+          ],
+          "description": "%config.language.description%"
+        },
+        "gitTools.provider": {
+          "type": "string",
+          "default": "OpenAI",
+          "order": 2,
+          "enum": [
+            "OpenAI",
+            "Anthropic"
+          ],
+          "enumDescriptions": [
+            "%config.provider.enum.openai%",
+            "%config.provider.enum.anthropic%"
+          ],
+          "description": "%config.provider.description%"
+        },
+        "gitTools.autoStageSelectedFiles": {
+          "type": "boolean",
+          "default": true,
+          "order": 3,
+          "description": "%config.autoStageSelectedFiles.description%"
+        },
+        "gitTools.userAgent": {
+          "type": "string",
+          "order": 4,
+          "default": "",
+          "description": "%config.userAgent.description%"
+        },
+        "gitTools.openai.baseUrl": {
+          "type": "string",
+          "order": 5,
+          "default": "https://api.deepseek.com/v1",
+          "description": "%config.openai.baseUrl.description%",
+          "when": "gitTools.provider == OpenAI"
+        },
+        "gitTools.openai.apiKey": {
+          "type": "string",
+          "order": 6,
+          "default": "",
+          "description": "%config.openai.apiKey.description%",
+          "when": "gitTools.provider == OpenAI"
+        },
+        "gitTools.openai.model": {
+          "type": "string",
+          "order": 7,
+          "default": "deepseek-chat",
+          "description": "%config.openai.model.description%",
+          "when": "gitTools.provider == OpenAI"
+        },
+        "gitTools.openai.temperature": {
+          "type": "number",
+          "order": 8,
+          "default": 0.3,
+          "minimum": 0,
+          "maximum": 2,
+          "description": "%config.openai.temperature.description%",
+          "when": "gitTools.provider == OpenAI"
+        },
+        "gitTools.openai.topP": {
+          "type": "number",
+          "order": 9,
+          "default": 1,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "%config.openai.topP.description%",
+          "when": "gitTools.provider == OpenAI"
+        },
+        "gitTools.openai.maxTokens": {
+          "type": "number",
+          "order": 10,
+          "default": 500,
+          "minimum": 1,
+          "description": "%config.openai.maxTokens.description%",
+          "when": "gitTools.provider == OpenAI"
+        },
+        "gitTools.anthropic.baseUrl": {
+          "type": "string",
+          "order": 11,
+          "default": "https://api.deepseek.com/v1",
+          "description": "%config.anthropic.baseUrl.description%",
+          "when": "gitTools.provider == Anthropic"
+        },
+        "gitTools.anthropic.apiKey": {
+          "type": "string",
+          "order": 12,
+          "default": "",
+          "description": "%config.anthropic.apiKey.description%",
+          "when": "gitTools.provider == Anthropic"
+        },
+        "gitTools.anthropic.model": {
+          "type": "string",
+          "order": 13,
+          "default": "deepseek-chat",
+          "description": "%config.anthropic.model.description%",
+          "when": "gitTools.provider == Anthropic"
+        },
+        "gitTools.anthropic.temperature": {
+          "type": "number",
+          "order": 14,
+          "default": 0.3,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "%config.anthropic.temperature.description%",
+          "when": "gitTools.provider == Anthropic"
+        },
+        "gitTools.anthropic.topP": {
+          "type": "number",
+          "order": 15,
+          "default": 1,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "%config.anthropic.topP.description%",
+          "when": "gitTools.provider == Anthropic"
+        },
+        "gitTools.anthropic.maxTokens": {
+          "type": "number",
+          "order": 16,
+          "default": 500,
+          "minimum": 1,
+          "description": "%config.anthropic.maxTokens.description%",
+          "when": "gitTools.provider == Anthropic"
+        },
+        "gitTools.git.untrackedFileMaxBytes": {
+          "type": "number",
+          "order": 17,
+          "default": 51200,
+          "minimum": 0,
+          "description": "%config.git.untrackedFileMaxBytes.description%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "vite build",
+    "watch": "vite build --mode development --watch",
+    "package": "vite build --mode production",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "vscode:package": "npm run package && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.30",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^3.3.2",
+    "terser": "^5.39.0",
+    "typescript": "^5.4.2",
+    "vite": "^6.2.5",
+    "vitest": "^4.1.5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "openai": "^6.42.0",
+    "simple-git": "^3.27.0"
+  },
+  "keywords": [
+    "ai",
+    "git",
+    "git-commit",
+    "git-exclude",
+    "llm",
+    "commit-message",
+    "openai",
+    "anthropic"
+  ],
+  "author": "luohe",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/617luohe/vscode-git-plugins.git",
+    "directory": "git-tools"
+  },
+  "l10n": "./l10n"
+}

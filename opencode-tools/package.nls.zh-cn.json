@@ -1,0 +1,11 @@
+{
+  "extension.description": "一键启动 OpenCode 并切换其配置：活动栏快捷启动、整套配置切换（纯 DeepSeek / 纯 Max JOJO / 混合）以及 omos/pomos 模式切换。",
+  "command.selectProfile": "选择 OpenCode 配置（Profile）",
+  "command.toggleMode": "切换 omos / pomos",
+  "command.launch": "用当前配置启动 OpenCode",
+  "command.installOpenCode": "安装 OpenCode",
+  "container.title": "OpenCode",
+  "view.launch": "OpenCode",
+  "setting.configFile": "OpenCode 主配置文件的绝对路径（留空则自动探测常见位置）。",
+  "setting.profileDir": "存放 OpenCode 配置模板的目录绝对路径。留空则自动使用主配置所在目录下的 profiles 子目录；为空时首次自动生成 DeepSeek / Jojo 模板。"
+}

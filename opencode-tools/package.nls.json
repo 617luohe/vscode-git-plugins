@@ -1,0 +1,11 @@
+{
+  "extension.description": "Launch OpenCode and switch its config: Activity Bar quick-launch, profile switcher (pure DeepSeek / pure Max JOJO / hybrid) and omos/pomos mode switcher.",
+  "command.selectProfile": "Select OpenCode Profile",
+  "command.toggleMode": "Toggle omos / pomos",
+  "command.launch": "Launch OpenCode",
+  "command.installOpenCode": "Install OpenCode",
+  "container.title": "OpenCode",
+  "view.launch": "OpenCode",
+  "setting.configFile": "Absolute path to the OpenCode main config file (empty = auto-detect common locations).",
+  "setting.profileDir": "Directory containing OpenCode config templates. Leave empty to auto-detect a 'profiles' subdirectory next to the main config; seeds DeepSeek/Jojo templates on first run."
+}

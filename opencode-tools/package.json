@@ -1,0 +1,63 @@
+{
+  "name": "opencode-tools",
+  "displayName": "OpenCode Tools",
+  "description": "%extension.description%",
+  "version": "0.1.0",
+  "publisher": "luohe",
+  "engines": { "vscode": "^1.75.0", "node": ">=20.0.0" },
+  "categories": ["Other", "AI"],
+  "main": "./dist/extension.js",
+  "icon": "assets/icon.png",
+  "activationEvents": ["onStartupFinished", "onView:opencode-tools.launch"],
+  "contributes": {
+    "commands": [
+      { "command": "opencode-tools.selectProfile", "title": "%command.selectProfile%", "icon": "$(list-selection)" },
+      { "command": "opencode-tools.toggleMode", "title": "%command.toggleMode%", "icon": "$(sync)" },
+      { "command": "opencode-tools.launch", "title": "%command.launch%", "icon": "$(play)" },
+      { "command": "opencode-tools.installOpenCode", "title": "%command.installOpenCode%" }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "opencode-tools.installOpenCode", "when": "false" }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [{ "id": "opencode-tools", "title": "%container.title%", "icon": "assets/opencode-activity.svg" }]
+    },
+    "views": {
+      "opencode-tools": [{ "id": "opencode-tools.launch", "name": "%view.launch%", "type": "tree" }]
+    },
+    "configuration": {
+      "title": "OpenCode Tools",
+      "properties": {
+        "opencodeTools.configFile": {
+          "type": "string",
+          "default": "",
+          "description": "%setting.configFile%"
+        },
+        "opencodeTools.profileDir": {
+          "type": "string",
+          "default": "",
+          "description": "%setting.profileDir%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "vite build",
+    "package": "npm run compile && vsce package",
+    "typecheck": "tsc --noEmit",
+    "vscode:package": "npm run compile && vsce package",
+    "watch": "vite build --mode development --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.30",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.4.2",
+    "vite": "^6.2.5"
+  },
+  "l10n": "./l10n",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/617luohe/vscode-git-plugins.git" }
+}
