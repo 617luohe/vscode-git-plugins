@@ -1,0 +1,7 @@
+{
+  "extension.description": "Switch between full OpenCode config files (e.g. pure DeepSeek / pure Max JOJO / hybrid) from the VS Code status bar; takes effect on next opencode launch.",
+  "command.select": "Select OpenCode Profile",
+  "command.launch": "Launch OpenCode with current profile",
+  "setting.profileDir": "Absolute path to the directory containing OpenCode config templates. Leave empty to auto-detect a 'profiles' subdirectory next to the main config file; on first run when empty it seeds three template skeletons (pure DeepSeek / pure Max JOJO / hybrid). Complete the apiKeys before switching.",
+  "setting.configFile": "Absolute path to the OpenCode main config file (empty = auto-detect common locations)."
+}
