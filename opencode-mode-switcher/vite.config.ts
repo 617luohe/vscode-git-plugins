@@ -12,6 +12,6 @@ export default defineConfig({
     sourcemap: true,
     outDir: "dist",
     emptyOutDir: true,
-    rollupOptions: { external: ["vscode"] },
+    rollupOptions: { external: ["vscode", "fs", "os", "path"] },
   },
 })

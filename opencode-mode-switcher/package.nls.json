@@ -1,5 +1,6 @@
 {
   "extension.description": "在 omos（oh-my-opencode-slim）与 pomos（纯原生）之间切换 OpenCode 启动模式，并在状态栏显示当前配置。",
   "command.toggle": "切换 omos / pomos",
-  "command.launch": "用当前模式启动 OpenCode"
+  "command.launch": "用当前模式启动 OpenCode",
+  "setting.configFile": "opencode 配置文件的绝对路径（留空则自动探测常见位置）"
 }
