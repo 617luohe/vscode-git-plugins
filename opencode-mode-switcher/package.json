@@ -8,11 +8,7 @@
   "categories": ["Other", "AI"],
   "main": "./dist/extension.js",
   "icon": "assets/icon.png",
-  "activationEvents": [
-    "onView:opencode-mode-switcher.switch",
-    "onCommand:opencode-mode-switcher.toggle",
-    "onCommand:opencode-mode-switcher.launch"
-  ],
+  "activationEvents": [],
   "contributes": {
     "commands": [
       { "command": "opencode-mode-switcher.toggle", "title": "%command.toggle%", "icon": "$(sync)" },
@@ -21,16 +17,6 @@
     "menus": {
       "statusBar/commandPalette": [
         { "command": "opencode-mode-switcher.toggle", "when": "false" }
-      ]
-    },
-    "viewsContainers": {
-      "activitybar": [
-        { "id": "opencode-mode-switcher", "title": "%container.title%", "icon": "assets/opencode-mode-activity.svg" }
-      ]
-    },
-    "views": {
-      "opencode-mode-switcher": [
-        { "id": "opencode-mode-switcher.switch", "name": "%view.switch%", "type": "tree" }
       ]
     }
   },
