@@ -1,0 +1,39 @@
+{
+  "name": "opencode-mode-switcher",
+  "displayName": "OpenCode Mode Switcher",
+  "description": "在 omos（oh-my-opencode-slim）与 pomos（纯原生）之间切换 OpenCode 启动模式，并提供状态栏显示与带配置启动。",
+  "version": "0.0.1",
+  "publisher": "luohe",
+  "engines": { "vscode": "^1.75.0", "node": ">=20.0.0" },
+  "categories": ["Other", "AI"],
+  "main": "./dist/extension.js",
+  "icon": "assets/icon.png",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      { "command": "opencode-mode-switcher.toggle", "title": "%command.toggle%", "icon": "$(sync)" },
+      { "command": "opencode-mode-switcher.launch", "title": "%command.launch%", "icon": "$(play)" }
+    ],
+    "menus": {
+      "statusBar/commandPalette": [
+        { "command": "opencode-mode-switcher.toggle", "when": "false" }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "vite build",
+    "package": "npm run compile && vsce package",
+    "typecheck": "tsc --noEmit",
+    "vscode:package": "npm run compile && vsce package",
+    "watch": "vite build --mode development --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.30",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.4.2",
+    "vite": "^6.2.5"
+  },
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/617luohe/vscode-git-plugins.git" }
+}
