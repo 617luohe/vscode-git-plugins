@@ -15,9 +15,42 @@ const READY_INTERVAL_MS = 200
 
 const TOGGLE_COMMAND = "opencode-mode-switcher.toggle"
 const LAUNCH_COMMAND = "opencode-mode-switcher.launch"
+const VIEW_ID = "opencode-mode-switcher.switch"
 
 function readStoredMode(context: vscode.ExtensionContext): LaunchMode {
   return context.globalState.get<LaunchMode>(STORAGE_KEY, "pomos")
+}
+
+/** 活动栏树形视图的数据源：显示当前模式，点击项即切换 */
+class SwitchTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+  private readonly emitter = new vscode.EventEmitter<vscode.TreeItem | undefined>()
+
+  public readonly onDidChangeTreeData = this.emitter.event
+
+  public constructor(private mode: LaunchMode) {}
+
+  public refresh(mode: LaunchMode): void {
+    this.mode = mode
+    this.emitter.fire(undefined)
+  }
+
+  public getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
+    return element
+  }
+
+  public getChildren(): vscode.TreeItem[] {
+    const item = new vscode.TreeItem(
+      this.mode === "omos" ? "$(sync~spin) omos（加载插件）" : "$(circle-slash) pomos（原生）",
+      vscode.TreeItemCollapsibleState.None,
+    )
+    item.command = {
+      command: TOGGLE_COMMAND,
+      title: "切换 omos / pomos",
+      tooltip: "点击切换 omos / pomos",
+    }
+    item.tooltip = this.mode === "omos" ? "当前模式：omos，点击切换为 pomos" : "当前模式：pomos，点击切换为 omos"
+    return [item]
+  }
 }
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -25,7 +58,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
   statusBar.command = TOGGLE_COMMAND
-  const render = (): void => {
+  const renderStatusBar = (): void => {
     statusBar.text = mode === "omos" ? "$(sync~spin) omos" : "$(circle-slash) pomos"
     statusBar.tooltip =
       mode === "omos"
@@ -33,16 +66,25 @@ export function activate(context: vscode.ExtensionContext): void {
         : "OpenCode 将以原生纯净模式启动"
     statusBar.show()
   }
-  render()
+  renderStatusBar()
+
+  const treeProvider = new SwitchTreeDataProvider(mode)
+  const treeView = vscode.window.createTreeView(VIEW_ID, { treeDataProvider: treeProvider })
+
+  const switchMode = async (): Promise<void> => {
+    mode = mode === "omos" ? "pomos" : "omos"
+    await context.globalState.update(STORAGE_KEY, mode)
+    renderStatusBar()
+    treeProvider.refresh(mode)
+    const label = mode === "omos" ? "omos（加载 oh-my-opencode-slim）" : "pomos（原生纯净）"
+    void vscode.window.showInformationMessage(`OpenCode 已切换到：${label}。下次启动生效。`)
+  }
 
   context.subscriptions.push(
     statusBar,
+    treeView,
     vscode.commands.registerCommand(TOGGLE_COMMAND, async () => {
-      mode = mode === "omos" ? "pomos" : "omos"
-      await context.globalState.update(STORAGE_KEY, mode)
-      render()
-      const label = mode === "omos" ? "omos（加载 oh-my-opencode-slim）" : "pomos（原生纯净）"
-      void vscode.window.showInformationMessage(`OpenCode 已切换到：${label}。下次启动生效。`)
+      await switchMode()
     }),
     vscode.commands.registerCommand(LAUNCH_COMMAND, () => {
       launch(context, mode)
@@ -52,7 +94,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
 function launch(context: vscode.ExtensionContext, mode: LaunchMode): void {
   const env: Record<string, string> = { OPENCODE_CALLER: "vscode" }
-  if (mode === "omos") env.OPENCODE_CONFIG_CONTENT = OMOS_ENV
+  if (mode === "omos") env["OPENCODE_CONFIG_CONTENT"] = OMOS_ENV
 
   const port = Math.floor(Math.random() * PORT_RANGE) + PORT_MIN
   const terminal = vscode.window.createTerminal({
@@ -66,8 +108,7 @@ function launch(context: vscode.ExtensionContext, mode: LaunchMode): void {
   const reference = activeEditorReference()
   if (!reference) return
 
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  waitForReady(port, READY_ATTEMPTS, READY_INTERVAL_MS).then((ready) => {
+  void waitForReady(port, READY_ATTEMPTS, READY_INTERVAL_MS).then((ready) => {
     if (ready) {
       void appendPrompt(port, `In ${reference}`).catch(() => undefined)
       terminal.show()
