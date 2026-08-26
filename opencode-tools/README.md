@@ -4,7 +4,7 @@
 
 1. **活动栏快捷启动**（原 `opencode-sidebar`）：点击左侧活动栏的 OpenCode 图标即直接启动（`opencode.openNewTerminal`），侧边栏不再有"点击启动"子项。
 2. **整套配置切换**（原 `opencode-profile-switcher`）：从状态栏选择并切换整套 OpenCode 配置（纯 DeepSeek / 纯 Max JOJO / 混合）。
-3. **omos/pomos 模式切换**（原 `opencode-mode-switcher`）：在 omos（加载 `oh-my-opencode-slim`）与 pomos（原生）之间切换。
+3. **omos/pomos 模式切换**（原 `opencode-mode-switcher`）：在 omos（加载 `omos` 插件）与 pomos（原生）之间切换。
 
 ## 功能
 

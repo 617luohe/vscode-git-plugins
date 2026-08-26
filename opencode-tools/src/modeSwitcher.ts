@@ -3,8 +3,15 @@ import * as fs from "fs"
 
 export type LaunchMode = "omos" | "pomos"
 
-/** oh-my-opencode-slim 插件名（opencode 把 plugin 数组合并而非替换，故 pomos 需从配置中移除该条目） */
-const OMOS_PLUGIN = "oh-my-opencode-slim@2.2.15"
+/**
+ * omos 插件规格（opencode 把 plugin 数组合并而非替换，故 pomos 需从配置中移除该条目）。
+ *
+ * 采用 file:// 本地安装路径指向 omos 的构建产物（dist/index.js），而非 npm 包名 "omos"——
+ * 公网 npm 上 "omos" 已被无关项目占用，opencode 用包名解析会拉到错误包导致 TUI 崩溃。
+ * 该路径按 Windows 本地 VSCode 场景硬编码；换机/换目录时需同步更新。
+ */
+const OMOS_PLUGIN =
+  "file:///C:/Users/Administrator/.config/opencode/vendor/omos/dist/index.js"
 const STORAGE_KEY = "opencodeTools.launchMode"
 const TOGGLE_COMMAND = "opencode-tools.toggleMode"
 
@@ -14,7 +21,8 @@ function readModeFromConfig(configFile: string): LaunchMode {
     const raw = fs.readFileSync(configFile, "utf8")
     const m = raw.match(/"plugin"\s*:\s*\[([^\]]*)\]/)
     if (!m) return "pomos"
-    return m[1].includes("oh-my-opencode-slim") ? "omos" : "pomos"
+    // omos 条目是 file:// 本地路径，判断数组文本里是否含 omos（兼容原 npm 名 "omos"）
+    return m[1].includes("omos") ? "omos" : "pomos"
   } catch {
     return "pomos"
   }
@@ -57,7 +65,7 @@ export function registerModeSwitcher(
     statusBar.text = mode === "omos" ? "$(rocket) omos" : "$(circle-slash) pomos"
     statusBar.tooltip =
       mode === "omos"
-        ? "OpenCode 将加载 oh-my-opencode-slim 插件（点击切换为原生）"
+        ? "OpenCode 将加载 omos 插件（点击切换为原生）"
         : "OpenCode 将以原生纯净模式启动（点击切换为 omos）"
     statusBar.show()
   }
@@ -71,7 +79,7 @@ export function registerModeSwitcher(
       mode = next
       await context.globalState.update(STORAGE_KEY, mode)
       render()
-      const label = next === "omos" ? "omos（加载 oh-my-opencode-slim）" : "pomos（原生纯净）"
+      const label = next === "omos" ? "omos（加载 omos 插件）" : "pomos（原生纯净）"
       void vscode.window.showInformationMessage(`OpenCode 已切换到：${label}。下次启动 opencode 生效。`)
     }),
   )
