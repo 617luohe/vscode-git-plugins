@@ -16,10 +16,8 @@
 
 `opencode-tools` 委托调用独立安装的 OpenCode 插件（`sst-dev.opencode`），不内置或重新实现 OpenCode。
 
-## 旧插件目录
-
-`opencode-sidebar`、`opencode-mode-switcher`、`opencode-profile-switcher`、`quick-git-commit`、`quick-git-exclude`
-为保留的旧版本（历史参考），合并后无需单独安装，其功能与命令已并入上述两个统一插件。
+> 历史插件 `opencode-sidebar`、`opencode-mode-switcher`、`opencode-profile-switcher`、`quick-git-commit`、`quick-git-exclude`
+> 已合并进上述两个统一插件并从仓库移除；如需查看其源码可从 git 历史（`1cf500e` 及之前）获取。
 
 ## 开发
 

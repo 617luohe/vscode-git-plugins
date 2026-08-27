@@ -1,6 +1,0 @@
-{
-  "extension.description": "Launch OpenCode from the Activity Bar.",
-  "command.installOpenCode": "Install OpenCode",
-  "view.launch": "Launch OpenCode",
-  "container.title": "OpenCode"
-}

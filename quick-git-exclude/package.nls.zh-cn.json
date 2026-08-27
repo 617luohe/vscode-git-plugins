@@ -1,4 +1,0 @@
-{
-    "extension.description": "通过右键菜单快速将文件从 Git 版本管理中移除（git rm --cached）。",
-    "command.excludeFromVC": "从版本管理器中排出"
-}

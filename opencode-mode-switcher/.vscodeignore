@@ -1,7 +1,0 @@
-src/
-*.test.ts
-tsconfig.json
-vite.config.ts
-node_modules/
-dist/*.map
-.DS_Store

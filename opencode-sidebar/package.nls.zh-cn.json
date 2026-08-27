@@ -1,6 +1,0 @@
-{
-  "extension.description": "从活动栏启动 OpenCode。",
-  "command.installOpenCode": "安装 OpenCode",
-  "view.launch": "启动 OpenCode",
-  "container.title": "OpenCode"
-}

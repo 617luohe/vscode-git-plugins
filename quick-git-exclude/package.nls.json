@@ -1,4 +1,0 @@
-{
-    "extension.description": "Exclude files from Git version control (git rm --cached) via right-click context menu.",
-    "command.excludeFromVC": "Exclude from Version Control"
-}
