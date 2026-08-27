@@ -46,6 +46,7 @@
   "scripts": {
     "compile": "vite build",
     "package": "npm run compile && vsce package",
+    "test": "bun test",
     "typecheck": "tsc --noEmit",
     "vscode:package": "npm run compile && vsce package",
     "watch": "vite build --mode development --watch"

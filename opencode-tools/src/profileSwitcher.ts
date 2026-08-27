@@ -2,6 +2,7 @@ import * as vscode from "vscode"
 import * as fs from "fs"
 import * as path from "path"
 import { getSetting } from "./opencodeConfig"
+import { readModeFromConfig, writeModeToConfig } from "./modeSwitcher"
 
 /** 一套可切换的 OpenCode 配置（模板文件） */
 export interface Profile {
@@ -307,12 +308,16 @@ export function registerProfileSwitcher(
   const applyProfile = async (profile: Profile): Promise<void> => {
     if (!configFile) return
     try {
+      // Profiles are full-file templates and usually omit `plugin`. Preserve
+      // current omos/pomos mode across profile switches.
+      const previousMode = readModeFromConfig(configFile)
       const template = fs.readFileSync(profile.filePath, "utf8")
       fs.writeFileSync(configFile, template, "utf8")
+      writeModeToConfig(configFile, previousMode)
       await context.globalState.update(GLOBAL_PREV_PATH_KEY, profile.filePath)
       refresh()
       void vscode.window.showInformationMessage(
-        `OpenCode 配置已切换为「${profile.name}」。下次启动 opencode 生效。`,
+        `OpenCode 配置已切换为「${profile.name}」（已保留 ${previousMode} 模式）。下次启动 opencode 生效。`,
       )
     } catch (e) {
       void vscode.window.showErrorMessage(`写入 OpenCode 配置失败：${String(e)}`)
