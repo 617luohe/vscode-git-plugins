@@ -27,6 +27,30 @@
 | `opencodeTools.configFile` | `""` | OpenCode 主配置文件绝对路径，留空自动探测常见位置 |
 | `opencodeTools.profileDir` | `""` | 模板目录，留空自动使用主配置所在目录下的 `profiles` 子目录 |
 
+## omos 插件部署与更新
+
+本插件的 omos/pomos 开关只改主配置 `opencode.jsonc` 的 `plugin` 数组，不负责部署 omos 本体。omos 插件由 omos 仓库维护，部署位置为：
+
+```
+~/.config/opencode/vendor/omos/dist/index.js
+```
+
+**首次部署 / 版本更新**（在 omos 仓库内执行，WSL 侧而非 Windows UNC 侧）：
+
+```bash
+cd ~/workplace/omos
+bun install && bun run build
+mkdir -p ~/.config/opencode/vendor/omos
+cp -r dist omos.schema.json package.json ~/.config/opencode/vendor/omos/
+```
+
+> 切换器 `modeSwitcher.ts` 已同时识别本地 `file://` 入口与私有 scoped 包 `@617luohe/omos`；当前默认走本地 `vendor/omos/dist/index.js` 路径。
+
+**运行时配置** `~/.config/opencode/omos.json` 与主配置互不冲突，插件加载后读取。其中新字段：
+
+- `orchestration.triggers: ["build", "ulw"]` —— 只有用户消息命中这些词时才进入完整多代理编排，否则主编排器直接干活（节省 token）。
+- `offpeakQueue.storagePath` —— offpeak 排队持久化文件（可选）。
+
 ## 使用
 
 - 打开命令面板（`Ctrl+Shift+P`）运行 `选择 OpenCode 配置` 切换整套配置。
