@@ -3,6 +3,7 @@ import * as fs from "fs"
 import * as path from "path"
 import { getSetting } from "./opencodeConfig"
 import { readModeFromConfig, writeModeToConfig } from "./modeSwitcher"
+import { syncOmosConfig } from "./omosSync"
 
 /** 一套可切换的 OpenCode 配置（模板文件） */
 export interface Profile {
@@ -314,10 +315,15 @@ export function registerProfileSwitcher(
       const template = fs.readFileSync(profile.filePath, "utf8")
       fs.writeFileSync(configFile, template, "utf8")
       writeModeToConfig(configFile, previousMode)
+      // 若 profile 有同名配套 omos 模板（profiles/<name>.omos），随切换同步到 omos.json。
+      const omosSynced =
+        profileDir !== undefined && syncOmosConfig(configFile, profileDir, profile.name)
       await context.globalState.update(GLOBAL_PREV_PATH_KEY, profile.filePath)
       refresh()
       void vscode.window.showInformationMessage(
-        `OpenCode 配置已切换为「${profile.name}」（已保留 ${previousMode} 模式）。下次启动 opencode 生效。`,
+        `OpenCode 配置已切换为「${profile.name}」（已保留 ${previousMode} 模式${
+          omosSynced ? "，同步 omos 配置" : "，omos 配置未变"
+        }）。下次启动 opencode 生效。`,
       )
     } catch (e) {
       void vscode.window.showErrorMessage(`写入 OpenCode 配置失败：${String(e)}`)
